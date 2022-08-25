@@ -1,16 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ConnectModal from "./components/ConnectModal";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "./utils/firebase.config";
+import { auth, db } from "./utils/firebase.config";
 import CreatePost from "./components/CreatePost";
+import { collection, getDocs } from "firebase/firestore";
+import Post from "./components/Post";
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   // verifie si un utilisateur est connecté
   onAuthStateChanged(auth, (currentUser) => {
     setUser(currentUser);
   });
+
+  useEffect(() => {
+    getDocs(collection(db, "posts")).then((res) =>
+      setPosts(res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+    );
+  }, []);
 
   // fonction pour deconnecter l'utilisateur
   const handleLogout = async () => {
@@ -29,9 +38,20 @@ const App = () => {
             </button>
           </div>
         )}
-        {user ? <CreatePost /> : <ConnectModal />}
+        {user ? (
+          <CreatePost uid={user.uid} displayName={user.displayName} />
+        ) : (
+          <ConnectModal />
+        )}
       </div>
-      <div className="posts-container"></div>
+      <div className="posts-container">
+        {posts &&
+          posts
+            .sort((a, b) => b.date - a.date)
+            .map((post, index) => (
+              <Post key={post.id} post={post} user={user} />
+            ))}
+      </div>
     </div>
   );
 };

@@ -36,7 +36,11 @@ const Login = () => {
             ref={loginPassword}
           />
           <input type="submit" value="Se connecter" />
-          {error && alert("Mail ou mot de passe incorrect !")}
+          {error && (
+            <p style={{ color: "rgb(211,27,57)" }}>
+              Mail ou mot de passe incorrect !
+            </p>
+          )}
         </form>
       </div>
     </div>
