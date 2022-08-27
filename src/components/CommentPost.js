@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../utils/firebase.config";
-import { doc, updateDoc } from "firebase/firestore";
+import { auth } from "../utils/firebase.config";
 import CommentCard from "./CommentCard";
+import { useDispatch } from "react-redux";
+import { addComment } from "../actions/post.action";
 
 const CommentPost = ({ post }) => {
   const [user, setUser] = useState(null);
-  const AnswerRef = useRef();
+  const answerRef = useRef([]);
+  const dispatch = useDispatch();
 
   // verifie si un utilisateur est connecté
   // bien qu'on pouvaint le passer en prop, il n'est pas recommander trilling raison pour laquelle on le rappelle ici
@@ -23,7 +25,7 @@ const CommentPost = ({ post }) => {
       data = [
         {
           commentAuthor: user.displayName,
-          text: AnswerRef.current.value,
+          text: answerRef.current.value,
         },
       ];
     } else {
@@ -31,19 +33,21 @@ const CommentPost = ({ post }) => {
         ...post.comments,
         {
           commentAuthor: user.displayName,
-          text: AnswerRef.current.value,
+          text: answerRef.current.value,
         },
       ];
     }
 
-    updateDoc(doc(db, "posts", post.id), { comments: data });
-    AnswerRef.current.value = "";
+    dispatch(addComment(post.id, data));
+    answerRef.current.value = "";
   };
 
   return (
     <div className="comment-container">
       <h5 className="comment-title">
-        {post.comments ? "Commentaires :" : "Soyez le premier à commenter"}
+        {post.comments
+          ? "Commentaires :"
+          : "Soyez la première personne à commenter"}
       </h5>
       {post.comments &&
         post.comments.map((comment, index) => (
@@ -54,7 +58,8 @@ const CommentPost = ({ post }) => {
         <form onSubmit={(e) => handleComment(e)}>
           <textarea
             placeholder="Envoyer un commentaire"
-            ref={AnswerRef}
+            // onChange={(e) => setAnswer(e.target.value)}
+            ref={answerRef}
           ></textarea>
           <input type="submit" value="Envoyer" />
         </form>

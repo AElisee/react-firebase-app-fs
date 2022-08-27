@@ -23,6 +23,15 @@ const Login = () => {
     }
   };
 
+  const loginError = () => {
+    const p = document.getElementById("errorMess");
+    p.textContent = "Mail ou mot de passe incorrect !";
+
+    setTimeout(() => {
+      p.textContent = "";
+    }, 3000);
+  };
+
   return (
     <div className="login-container">
       <div className="login">
@@ -36,11 +45,15 @@ const Login = () => {
             ref={loginPassword}
           />
           <input type="submit" value="Se connecter" />
-          {error && (
-            <p style={{ color: "rgb(211,27,57)" }}>
-              Mail ou mot de passe incorrect !
-            </p>
-          )}
+          <p
+            id="errorMess"
+            style={{
+              color: "rgb(211,27,57)",
+              transition: "0.7s ease-in-out",
+              padding: "10px 0",
+            }}
+          ></p>
+          {error && loginError()}
         </form>
       </div>
     </div>

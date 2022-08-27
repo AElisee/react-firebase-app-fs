@@ -1,10 +1,13 @@
 import React from "react";
-import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../utils/firebase.config";
+import { useDispatch } from "react-redux";
+import { deletePost, getPosts } from "../actions/post.action";
 
 const Delete = ({ postId }) => {
+  const dispatch = useDispatch();
   const handleDelete = () => {
-    deleteDoc(doc(db, "posts", postId));
+    dispatch(deletePost(postId));
+    // pour ressoudre l'erreur dans la console j'ai fait à nouveau getPosts()
+    dispatch(getPosts());
   };
   return (
     <div className="delete" onClick={() => handleDelete()}>
